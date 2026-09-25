@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\ComplaintStatus;
+use App\Models\Concerns\HasStatusHistory;
+use App\Models\Concerns\HasTicketNumber;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,7 +17,24 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Complaint extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, HasStatusHistory, HasTicketNumber, SoftDeletes;
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $complaint): void {
+            if (empty($complaint->complaint_number)) {
+                $complaint->complaint_number = self::generateTicketNumber('ADU');
+            }
+
+            if (empty($complaint->reported_at)) {
+                $complaint->reported_at = now();
+            }
+
+            if (empty($complaint->status)) {
+                $complaint->status = ComplaintStatus::RECEIVED;
+            }
+        });
+    }
 
     protected $fillable = [
         'complaint_number',
@@ -47,6 +66,11 @@ class Complaint extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(ComplaintCategory::class, 'complaint_category_id');
+    }
+
+    public function complaintCategory(): BelongsTo
+    {
+        return $this->category();
     }
 
     public function reporter(): BelongsTo

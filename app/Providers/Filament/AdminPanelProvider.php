@@ -28,8 +28,20 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->brandName('SAPA SOSIAL')
+            ->brandLogo(null)
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Emerald,
+            ])
+            ->sidebarCollapsibleOnDesktop()
+            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
+            ->navigationGroups([
+                'Pelayanan',
+                'Rehabilitasi Sosial',
+                'Pengaduan',
+                'Informasi Layanan',
+                'Data Master',
+                'Pengaturan Pengguna',
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')

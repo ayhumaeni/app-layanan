@@ -43,6 +43,7 @@ class UserSeeder extends Seeder
                 'district_id' => null,
                 'village_id' => null,
                 'is_active' => true,
+                'roles' => ['administrator'],
             ],
             // 2. Pejabat Penandatangan & Pimpinan
             [
@@ -54,6 +55,7 @@ class UserSeeder extends Seeder
                 'district_id' => null,
                 'village_id' => null,
                 'is_active' => true,
+                'roles' => ['pimpinan', 'pejabat_penandatangan'],
             ],
             [
                 'name' => 'Bambang Suryanto, S.Sos',
@@ -64,6 +66,7 @@ class UserSeeder extends Seeder
                 'district_id' => null,
                 'village_id' => null,
                 'is_active' => true,
+                'roles' => ['pejabat_penandatangan'],
             ],
             [
                 'name' => 'Dra. Endang Purwanti',
@@ -74,6 +77,7 @@ class UserSeeder extends Seeder
                 'district_id' => null,
                 'village_id' => null,
                 'is_active' => true,
+                'roles' => ['pejabat_penandatangan'],
             ],
             [
                 'name' => 'Drs. Mohamad Arifin',
@@ -84,6 +88,7 @@ class UserSeeder extends Seeder
                 'district_id' => null,
                 'village_id' => null,
                 'is_active' => true,
+                'roles' => ['pimpinan'],
             ],
             // 3. Petugas Teknis Pelayanan Dinsos
             [
@@ -95,6 +100,7 @@ class UserSeeder extends Seeder
                 'district_id' => null,
                 'village_id' => null,
                 'is_active' => true,
+                'roles' => ['petugas_dinsos'],
             ],
             [
                 'name' => 'Rina Kartikasari, S.Tr.Sos',
@@ -105,6 +111,7 @@ class UserSeeder extends Seeder
                 'district_id' => null,
                 'village_id' => null,
                 'is_active' => true,
+                'roles' => ['petugas_dinsos'],
             ],
             [
                 'name' => 'Dwi Handoko, S.Sos',
@@ -115,6 +122,7 @@ class UserSeeder extends Seeder
                 'district_id' => null,
                 'village_id' => null,
                 'is_active' => true,
+                'roles' => ['petugas_dinsos'],
             ],
             [
                 'name' => 'Siti Nurhaliza, S.Kom',
@@ -125,6 +133,7 @@ class UserSeeder extends Seeder
                 'district_id' => null,
                 'village_id' => null,
                 'is_active' => true,
+                'roles' => ['petugas_dinsos'],
             ],
             // 4. Operator Kecamatan & Desa
             [
@@ -136,6 +145,7 @@ class UserSeeder extends Seeder
                 'district_id' => $kanigoroDistrict?->id,
                 'village_id' => null,
                 'is_active' => true,
+                'roles' => ['operator_kecamatan_desa'],
             ],
             [
                 'name' => 'Anisa Fitri',
@@ -146,6 +156,7 @@ class UserSeeder extends Seeder
                 'district_id' => $kanigoroDistrict?->id,
                 'village_id' => $satreyanVillage?->id,
                 'is_active' => true,
+                'roles' => ['operator_kecamatan_desa'],
             ],
             [
                 'name' => 'Tri Wahyudi',
@@ -156,6 +167,7 @@ class UserSeeder extends Seeder
                 'district_id' => $wlingiDistrict?->id,
                 'village_id' => null,
                 'is_active' => true,
+                'roles' => ['operator_kecamatan_desa'],
             ],
             [
                 'name' => 'Nurul Huda',
@@ -166,6 +178,7 @@ class UserSeeder extends Seeder
                 'district_id' => $srengatDistrict?->id,
                 'village_id' => null,
                 'is_active' => true,
+                'roles' => ['operator_kecamatan_desa'],
             ],
             // 5. Masyarakat Pemohon / Pelapor
             [
@@ -177,6 +190,7 @@ class UserSeeder extends Seeder
                 'district_id' => $kanigoroDistrict?->id,
                 'village_id' => $satreyanVillage?->id,
                 'is_active' => true,
+                'roles' => ['masyarakat'],
             ],
             [
                 'name' => 'Siti Aminah',
@@ -187,6 +201,7 @@ class UserSeeder extends Seeder
                 'district_id' => $kanigoroDistrict?->id,
                 'village_id' => $kanigoroVillage?->id,
                 'is_active' => true,
+                'roles' => ['masyarakat'],
             ],
             [
                 'name' => 'Joko Susilo',
@@ -197,11 +212,12 @@ class UserSeeder extends Seeder
                 'district_id' => $wlingiDistrict?->id,
                 'village_id' => $beruVillage?->id,
                 'is_active' => true,
+                'roles' => ['masyarakat'],
             ],
         ];
 
         foreach ($users as $userData) {
-            User::updateOrCreate(
+            $user = User::updateOrCreate(
                 ['email' => $userData['email']],
                 [
                     'name' => $userData['name'],
@@ -215,6 +231,10 @@ class UserSeeder extends Seeder
                     'email_verified_at' => now(),
                 ]
             );
+
+            if (isset($userData['roles'])) {
+                $user->syncRoles($userData['roles']);
+            }
         }
     }
 }

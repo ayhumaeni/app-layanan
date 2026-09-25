@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\ReferralStatus;
+use App\Models\Concerns\HasStatusHistory;
+use App\Models\Concerns\HasTicketNumber;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,7 +16,24 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Referral extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, HasStatusHistory, HasTicketNumber, SoftDeletes;
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $referral): void {
+            if (empty($referral->referral_number)) {
+                $referral->referral_number = self::generateTicketNumber('RJK');
+            }
+
+            if (empty($referral->referral_date)) {
+                $referral->referral_date = now()->toDateString();
+            }
+
+            if (empty($referral->status)) {
+                $referral->status = ReferralStatus::DRAFT;
+            }
+        });
+    }
 
     protected $fillable = [
         'referral_number',

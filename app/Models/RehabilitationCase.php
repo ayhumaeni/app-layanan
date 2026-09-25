@@ -6,6 +6,8 @@ namespace App\Models;
 
 use App\Enums\HandlingType;
 use App\Enums\RehabilitationCaseStatus;
+use App\Models\Concerns\HasStatusHistory;
+use App\Models\Concerns\HasTicketNumber;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,7 +17,24 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class RehabilitationCase extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, HasStatusHistory, HasTicketNumber, SoftDeletes;
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $case): void {
+            if (empty($case->case_number)) {
+                $case->case_number = self::generateTicketNumber('RHS');
+            }
+
+            if (empty($case->received_at)) {
+                $case->received_at = now();
+            }
+
+            if (empty($case->status)) {
+                $case->status = RehabilitationCaseStatus::RECEIVED;
+            }
+        });
+    }
 
     protected $fillable = [
         'case_number',

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\ServiceRequestStatus;
+use App\Models\Concerns\HasStatusHistory;
+use App\Models\Concerns\HasTicketNumber;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,7 +17,26 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ServiceRequest extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, HasStatusHistory, HasTicketNumber, SoftDeletes;
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $request): void {
+            if (empty($request->request_number)) {
+                $serviceType = $request->serviceType ?? ServiceType::find($request->service_type_id);
+                $prefix = $serviceType?->code ?? 'REQ';
+                $request->request_number = self::generateTicketNumber($prefix);
+            }
+
+            if (empty($request->submitted_at)) {
+                $request->submitted_at = now();
+            }
+
+            if (empty($request->status)) {
+                $request->status = ServiceRequestStatus::SUBMITTED;
+            }
+        });
+    }
 
     protected $fillable = [
         'request_number',
