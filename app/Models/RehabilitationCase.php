@@ -31,7 +31,7 @@ class RehabilitationCase extends Model
             }
 
             if (empty($case->status)) {
-                $case->status = RehabilitationCaseStatus::RECEIVED;
+                $case->status = RehabilitationCaseStatus::Received;
             }
         });
     }

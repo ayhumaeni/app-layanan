@@ -31,7 +31,7 @@ class Complaint extends Model
             }
 
             if (empty($complaint->status)) {
-                $complaint->status = ComplaintStatus::RECEIVED;
+                $complaint->status = ComplaintStatus::Received;
             }
         });
     }

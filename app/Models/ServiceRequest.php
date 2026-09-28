@@ -33,7 +33,7 @@ class ServiceRequest extends Model
             }
 
             if (empty($request->status)) {
-                $request->status = ServiceRequestStatus::SUBMITTED;
+                $request->status = ServiceRequestStatus::Submitted;
             }
         });
     }

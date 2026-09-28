@@ -192,7 +192,7 @@ class ServiceRequestForm
                         Select::make('status')
                             ->label('Status Pengajuan')
                             ->options(ServiceRequestStatus::class)
-                            ->default(ServiceRequestStatus::SUBMITTED)
+                            ->default(ServiceRequestStatus::Submitted)
                             ->required(),
                         Select::make('officer_id')
                             ->label('Petugas Penanggung Jawab')

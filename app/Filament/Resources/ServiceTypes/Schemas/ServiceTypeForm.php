@@ -30,7 +30,7 @@ class ServiceTypeForm
                 Select::make('handler')
                     ->label('Tipe Alur Layanan')
                     ->options(ServiceRequestHandler::class)
-                    ->default(ServiceRequestHandler::GENERIC)
+                    ->default(ServiceRequestHandler::Generic)
                     ->required(),
                 TextInput::make('sla_days')
                     ->label('Target Waktu SLA (Hari Kerja)')

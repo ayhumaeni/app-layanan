@@ -30,7 +30,7 @@ class Referral extends Model
             }
 
             if (empty($referral->status)) {
-                $referral->status = ReferralStatus::DRAFT;
+                $referral->status = ReferralStatus::Draft;
             }
         });
     }
