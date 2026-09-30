@@ -20,6 +20,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 use UnitEnum;
 
 class RehabilitationCaseResource extends Resource
@@ -66,6 +67,26 @@ class RehabilitationCaseResource extends Resource
             'view' => ViewRehabilitationCase::route('/{record}'),
             'edit' => EditRehabilitationCase::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = Auth::user();
+
+        if (! $user) {
+            return $query;
+        }
+
+        // Petugas Dinsos hanya melihat kasus yang ditugaskan kepadanya atau yang belum memiliki petugas
+        if ($user->hasRole('petugas_dinsos') && ! $user->hasAnyRole(['administrator', 'pimpinan', 'pejabat_penandatangan'])) {
+            $query->where(function ($q) use ($user) {
+                $q->where('officer_id', $user->id)
+                    ->orWhereNull('officer_id');
+            });
+        }
+
+        return $query;
     }
 
     public static function getRecordRouteBindingEloquentQuery(): Builder

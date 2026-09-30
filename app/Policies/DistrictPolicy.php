@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Enums\PermissionType;
 use App\Models\District;
 use App\Models\User;
 
@@ -21,16 +22,16 @@ class DistrictPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasRole('administrator');
+        return $user->can(PermissionType::ManageRegions->value);
     }
 
     public function update(User $user, District $district): bool
     {
-        return $user->hasRole('administrator');
+        return $user->can(PermissionType::ManageRegions->value);
     }
 
     public function delete(User $user, District $district): bool
     {
-        return $user->hasRole('administrator');
+        return $user->can(PermissionType::ManageRegions->value);
     }
 }

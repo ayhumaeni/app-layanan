@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Enums\PermissionType;
 use App\Models\ReferralInstitution;
 use App\Models\User;
 
@@ -21,16 +22,16 @@ class ReferralInstitutionPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasRole('administrator') || $user->hasRole('petugas_dinsos');
+        return $user->can(PermissionType::ManageReferralInstitutions->value);
     }
 
     public function update(User $user, ReferralInstitution $referralInstitution): bool
     {
-        return $user->hasRole('administrator') || $user->hasRole('petugas_dinsos');
+        return $user->can(PermissionType::ManageReferralInstitutions->value);
     }
 
     public function delete(User $user, ReferralInstitution $referralInstitution): bool
     {
-        return $user->hasRole('administrator');
+        return $user->can(PermissionType::ManageReferralInstitutions->value);
     }
 }

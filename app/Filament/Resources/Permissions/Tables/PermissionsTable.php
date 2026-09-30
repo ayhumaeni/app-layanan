@@ -1,33 +1,58 @@
 <?php
 
-namespace App\Filament\Resources\Users\Tables;
+namespace App\Filament\Resources\Permissions\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use App\Enums\PermissionType;
 use Filament\Actions\EditAction;
-use Filament\Actions\ForceDeleteBulkAction;
-use Filament\Actions\RestoreBulkAction;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
-class UsersTable
+class PermissionsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('Nama Pengguna')
+                    ->label('Kode Izin')
+                    ->badge()
+                    ->color('gray')
                     ->searchable()
+                    ->sortable()
+                    ->copyable(),
+
+                TextColumn::make('description')
+                    ->label('Deskripsi / Label')
+                    ->state(fn ($record) => PermissionType::tryFrom($record->name)?->label() ?? $record->name)
+                    ->searchable(query: function ($query, string $search) {
+                        $matchedValues = [];
+                        foreach (PermissionType::cases() as $case) {
+                            if (str_contains(strtolower($case->label()), strtolower($search))) {
+                                $matchedValues[] = $case->value;
+                            }
+                        }
+
+                        return $query->whereIn('name', $matchedValues);
+                    }),
+
+                TextColumn::make('group')
+                    ->label('Kategori')
+                    ->badge()
+                    ->state(fn ($record) => PermissionType::tryFrom($record->name)?->group() ?? 'Umum')
+                    ->color(fn (string $state): string => match ($state) {
+                        'Pengaturan Pengguna' => 'danger',
+                        'Pelayanan' => 'success',
+                        'Rehabilitasi Sosial' => 'warning',
+                        'Pengaduan' => 'info',
+                        'Data Master' => 'primary',
+                        'Dashboard & Laporan' => 'secondary',
+                        default => 'gray',
+                    })
                     ->sortable(),
-                TextColumn::make('email')
-                    ->label('Email')
-                    ->searchable(),
+
                 TextColumn::make('roles.name')
-                    ->label('Peran')
+                    ->label('Dimiliki oleh Peran')
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'administrator' => 'Administrator',
@@ -45,19 +70,7 @@ class UsersTable
                         'petugas_dinsos' => 'success',
                         'operator_kecamatan_desa' => 'info',
                         default => 'gray',
-                    })
-                    ->searchable(),
-                TextColumn::make('workUnit.name')
-                    ->label('Unit Kerja')
-                    ->placeholder('-')
-                    ->searchable(),
-                TextColumn::make('district.name')
-                    ->label('Wilayah')
-                    ->formatStateUsing(fn ($record) => $record->village ? "{$record->district?->name} / {$record->village->name}" : ($record->district?->name ?? '-'))
-                    ->searchable(),
-                IconColumn::make('is_active')
-                    ->label('Aktif')
-                    ->boolean(),
+                    }),
             ])
             ->filters([
                 SelectFilter::make('roles')
@@ -72,23 +85,9 @@ class UsersTable
                         'masyarakat' => 'Masyarakat',
                         default => $record->name,
                     }),
-                SelectFilter::make('work_unit_id')
-                    ->label('Filter Unit Kerja')
-                    ->relationship('workUnit', 'name'),
-                SelectFilter::make('district_id')
-                    ->label('Filter Kecamatan')
-                    ->relationship('district', 'name'),
-                TrashedFilter::make(),
             ])
             ->recordActions([
                 EditAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
-                ]),
             ]);
     }
 }

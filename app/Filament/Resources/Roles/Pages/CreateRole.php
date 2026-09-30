@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\Users\Pages;
+namespace App\Filament\Resources\Roles\Pages;
 
-use App\Filament\Resources\Users\UserResource;
+use App\Filament\Resources\Roles\RoleResource;
 use Filament\Resources\Pages\CreateRecord;
 use Spatie\Permission\PermissionRegistrar;
 
-class CreateUser extends CreateRecord
+class CreateRole extends CreateRecord
 {
-    protected static string $resource = UserResource::class;
+    protected static string $resource = RoleResource::class;
 
     protected function afterCreate(): void
     {

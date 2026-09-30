@@ -2,10 +2,12 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
+use App\Enums\PermissionType;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
+use Spatie\Permission\PermissionRegistrar;
 
 class UserForm
 {
@@ -40,9 +42,28 @@ class UserForm
                 Select::make('roles')
                     ->label('Peran / Hak Akses (Role)')
                     ->relationship('roles', 'name')
+                    ->getOptionLabelFromRecordUsing(fn ($record) => match ($record->name) {
+                        'administrator' => 'Administrator (Super Admin)',
+                        'petugas_dinsos' => 'Petugas Dinsos',
+                        'pejabat_penandatangan' => 'Pejabat Penandatangan',
+                        'pimpinan' => 'Pimpinan',
+                        'operator_kecamatan_desa' => 'Operator Kecamatan / Desa',
+                        'masyarakat' => 'Masyarakat (Pemohon Publik)',
+                        default => $record->name,
+                    })
                     ->multiple()
                     ->preload()
-                    ->searchable(),
+                    ->searchable()
+                    ->required()
+                    ->helperText('Pilih satu atau lebih peran. Pengguna internal wajib memiliki minimal satu peran staf agar dapat mengakses panel admin.')
+                    ->disabled(fn () => ! (auth()->user()?->can(PermissionType::ManageUsers->value) || auth()->user()?->hasRole('administrator')))
+                    ->saveRelationshipsUsing(function ($record, $state) {
+                        if (! (auth()->user()?->can(PermissionType::ManageUsers->value) || auth()->user()?->hasRole('administrator'))) {
+                            return;
+                        }
+                        $record->syncRoles($state ?? []);
+                        app(PermissionRegistrar::class)->forgetCachedPermissions();
+                    }),
                 Select::make('work_unit_id')
                     ->label('Unit Kerja / Bidang')
                     ->relationship('workUnit', 'name')

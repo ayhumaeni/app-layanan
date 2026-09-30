@@ -7,6 +7,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Resources\Pages\EditRecord;
+use Spatie\Permission\PermissionRegistrar;
 
 class EditUser extends EditRecord
 {
@@ -19,5 +20,10 @@ class EditUser extends EditRecord
             ForceDeleteAction::make(),
             RestoreAction::make(),
         ];
+    }
+
+    protected function afterSave(): void
+    {
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 }

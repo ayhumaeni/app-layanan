@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Enums\PermissionType;
 use App\Models\User;
 use App\Models\Village;
 
@@ -21,16 +22,16 @@ class VillagePolicy
 
     public function create(User $user): bool
     {
-        return $user->hasRole('administrator');
+        return $user->can(PermissionType::ManageRegions->value);
     }
 
     public function update(User $user, Village $village): bool
     {
-        return $user->hasRole('administrator');
+        return $user->can(PermissionType::ManageRegions->value);
     }
 
     public function delete(User $user, Village $village): bool
     {
-        return $user->hasRole('administrator');
+        return $user->can(PermissionType::ManageRegions->value);
     }
 }

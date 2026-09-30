@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Enums\PermissionType;
 use App\Models\ServiceRequest;
 use App\Models\User;
 
@@ -11,29 +12,20 @@ class ServiceRequestPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->hasAnyRole([
-            'administrator',
-            'petugas_dinsos',
-            'pejabat_penandatangan',
-            'pimpinan',
-            'operator_kecamatan_desa',
-            'masyarakat',
-        ]);
+        return $user->can(PermissionType::ManageServiceRequests->value)
+            || $user->can(PermissionType::ViewServiceRequests->value)
+            || $user->can(PermissionType::SubmitServiceRequests->value);
     }
 
     public function view(User $user, ServiceRequest $serviceRequest): bool
     {
-        if ($user->hasAnyRole(['administrator', 'petugas_dinsos', 'pejabat_penandatangan', 'pimpinan'])) {
-            return true;
-        }
+        if ($user->can(PermissionType::ManageServiceRequests->value)
+            || $user->can(PermissionType::ViewServiceRequests->value)) {
+            if ($user->hasRole('operator_kecamatan_desa')) {
+                return $this->isInUserTerritory($user, $serviceRequest);
+            }
 
-        if ($user->hasRole('operator_kecamatan_desa')) {
-            if ($user->village_id && $serviceRequest->village_id === $user->village_id) {
-                return true;
-            }
-            if ($user->district_id && $serviceRequest->village?->district_id === $user->district_id) {
-                return true;
-            }
+            return true;
         }
 
         if ($user->hasRole('masyarakat')) {
@@ -45,27 +37,19 @@ class ServiceRequestPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasAnyRole([
-            'administrator',
-            'petugas_dinsos',
-            'operator_kecamatan_desa',
-            'masyarakat',
-        ]);
+        return $user->can(PermissionType::ManageServiceRequests->value)
+            || $user->can(PermissionType::SubmitServiceRequests->value);
     }
 
     public function update(User $user, ServiceRequest $serviceRequest): bool
     {
-        if ($user->hasAnyRole(['administrator', 'petugas_dinsos', 'pejabat_penandatangan'])) {
-            return true;
-        }
+        if ($user->can(PermissionType::ManageServiceRequests->value)
+            || $user->can(PermissionType::SignDocuments->value)) {
+            if ($user->hasRole('operator_kecamatan_desa')) {
+                return $this->isInUserTerritory($user, $serviceRequest);
+            }
 
-        if ($user->hasRole('operator_kecamatan_desa')) {
-            if ($user->village_id && $serviceRequest->village_id === $user->village_id) {
-                return true;
-            }
-            if ($user->district_id && $serviceRequest->village?->district_id === $user->district_id) {
-                return true;
-            }
+            return true;
         }
 
         return false;
@@ -73,16 +57,32 @@ class ServiceRequestPolicy
 
     public function delete(User $user, ServiceRequest $serviceRequest): bool
     {
-        return $user->hasRole('administrator');
+        // Hanya administrator (ditangani oleh Gate::before)
+        return false;
     }
 
     public function restore(User $user, ServiceRequest $serviceRequest): bool
     {
-        return $user->hasRole('administrator');
+        // Hanya administrator (ditangani oleh Gate::before)
+        return false;
     }
 
     public function forceDelete(User $user, ServiceRequest $serviceRequest): bool
     {
-        return $user->hasRole('administrator');
+        // Hanya administrator (ditangani oleh Gate::before)
+        return false;
+    }
+
+    private function isInUserTerritory(User $user, ServiceRequest $serviceRequest): bool
+    {
+        if ($user->village_id && $serviceRequest->village_id === $user->village_id) {
+            return true;
+        }
+
+        if ($user->district_id && $serviceRequest->village?->district_id === $user->district_id) {
+            return true;
+        }
+
+        return false;
     }
 }

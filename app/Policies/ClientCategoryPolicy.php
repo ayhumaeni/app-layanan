@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Enums\PermissionType;
 use App\Models\ClientCategory;
 use App\Models\User;
 
@@ -21,16 +22,16 @@ class ClientCategoryPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasRole('administrator');
+        return $user->can(PermissionType::ManageClientCategories->value);
     }
 
     public function update(User $user, ClientCategory $clientCategory): bool
     {
-        return $user->hasRole('administrator');
+        return $user->can(PermissionType::ManageClientCategories->value);
     }
 
     public function delete(User $user, ClientCategory $clientCategory): bool
     {
-        return $user->hasRole('administrator');
+        return $user->can(PermissionType::ManageClientCategories->value);
     }
 }
