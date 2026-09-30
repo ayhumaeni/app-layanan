@@ -38,7 +38,9 @@ class UserForm
                 TextInput::make('nik')
                     ->label('NIK (16 Digit)')
                     ->length(16)
-                    ->numeric(),
+                    ->rules(['nullable', 'digits:16'])
+                    ->placeholder('Contoh: 3505062002880001')
+                    ->dehydrateStateUsing(fn ($state) => filled($state) ? trim((string) $state) : null),
                 Select::make('roles')
                     ->label('Peran / Hak Akses (Role)')
                     ->relationship('roles', 'name')

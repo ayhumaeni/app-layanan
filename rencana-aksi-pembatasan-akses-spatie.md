@@ -203,20 +203,22 @@ Proyek ini sudah memiliki **14 Policy** di `app/Policies/`:
 
 | Policy | Model | Status | Catatan |
 |---|---|---|---|
-| `UserPolicy` | `User` | ⚠️ Perlu migrasi | Masih pakai `hasRole()` langsung |
-| `ServiceRequestPolicy` | `ServiceRequest` | ⚠️ Perlu migrasi | Sudah ada scoping wilayah & kepemilikan, tapi pakai role langsung |
-| `ComplaintPolicy` | `Complaint` | ⚠️ Perlu migrasi | Sudah ada scoping wilayah & kepemilikan |
-| `RehabilitationCasePolicy` | `RehabilitationCase` | ⚠️ Perlu migrasi | Sudah ada scoping petugas yang ditugaskan |
-| `ClientPolicy` | `Client` | ⚠️ Perlu migrasi | Data sensitif, sudah dibatasi role |
-| `ReferralPolicy` | `Referral` | ⚠️ Perlu migrasi | Sudah dibatasi role |
-| `DistrictPolicy` | `District` | ⚠️ Perlu migrasi | viewAny/view terbuka |
-| `VillagePolicy` | `Village` | ⚠️ Perlu migrasi | viewAny/view terbuka |
-| `WorkUnitPolicy` | `WorkUnit` | ⚠️ Perlu migrasi | |
-| `ServiceTypePolicy` | `ServiceType` | ⚠️ Perlu migrasi | |
-| `DtsenPurposePolicy` | `DtsenPurpose` | ⚠️ Perlu migrasi | |
-| `ComplaintCategoryPolicy` | `ComplaintCategory` | ⚠️ Perlu migrasi | |
-| `ClientCategoryPolicy` | `ClientCategory` | ⚠️ Perlu migrasi | |
-| `ReferralInstitutionPolicy` | `ReferralInstitution` | ⚠️ Perlu migrasi | |
+| `UserPolicy` | `User` | ✅ Selesai | Menggunakan `PermissionType::ManageUsers` (`kelola_user`) |
+| `ServiceRequestPolicy` | `ServiceRequest` | ✅ Selesai | `PermissionType::ManageServiceRequests` / `ViewServiceRequests` + scoping wilayah & pemohon |
+| `ComplaintPolicy` | `Complaint` | ✅ Selesai | `PermissionType::ManageComplaints` / `ViewComplaints` + scoping wilayah & pelapor |
+| `RehabilitationCasePolicy` | `RehabilitationCase` | ✅ Selesai | `PermissionType::ManageRehabilitation` / `ViewRehabilitation` + scoping penugasan petugas |
+| `ClientPolicy` | `Client` | ✅ Selesai | `PermissionType::ManageClients` / `ViewRehabilitation` (data sensitif) |
+| `ReferralPolicy` | `Referral` | ✅ Selesai | `PermissionType::ManageRehabilitation` / `ViewRehabilitation` |
+| `DistrictPolicy` | `District` | ✅ Selesai | `PermissionType::ManageRegions` (`kelola_wilayah`) |
+| `VillagePolicy` | `Village` | ✅ Selesai | `PermissionType::ManageRegions` (`kelola_wilayah`) |
+| `WorkUnitPolicy` | `WorkUnit` | ✅ Selesai | `PermissionType::ManageWorkUnits` (`kelola_unit_kerja`) |
+| `ServiceTypePolicy` | `ServiceType` | ✅ Selesai | `PermissionType::ManageServiceTypes` (`kelola_jenis_layanan`) |
+| `DtsenPurposePolicy` | `DtsenPurpose` | ✅ Selesai | `PermissionType::ManageDtsenPurposes` (`kelola_tujuan_dtsen`) |
+| `ComplaintCategoryPolicy` | `ComplaintCategory` | ✅ Selesai | `PermissionType::ManageComplaintCategories` (`kelola_kategori_pengaduan`) |
+| `ClientCategoryPolicy` | `ClientCategory` | ✅ Selesai | `PermissionType::ManageClientCategories` (`kelola_kategori_klien`) |
+| `ReferralInstitutionPolicy` | `ReferralInstitution` | ✅ Selesai | `PermissionType::ManageReferralInstitutions` (`kelola_lembaga_rujukan`) |
+| `RolePolicy` | `Role` | ✅ Baru | `PermissionType::ManageUsers` + proteksi peran sistem |
+| `PermissionPolicy` | `Permission` | ✅ Baru | `PermissionType::ManageUsers` |
 
 ### 4.6 Masalah pada Policy Saat Ini
 
@@ -375,24 +377,24 @@ public static function getEloquentQuery(): Builder
 
 ### 4.10 Checklist Migrasi Policy
 
-- [ ] Migrasi `ServiceRequestPolicy` → permission-based + scoping wilayah
-- [ ] Migrasi `ComplaintPolicy` → permission-based + scoping wilayah
-- [ ] Migrasi `RehabilitationCasePolicy` → permission-based + scoping petugas
-- [ ] Migrasi `ClientPolicy` → permission-based (data sensitif)
-- [ ] Migrasi `ReferralPolicy` → permission-based + scoping petugas
-- [ ] Migrasi `UserPolicy` → permission-based
-- [ ] Migrasi `DistrictPolicy` → permission-based
-- [ ] Migrasi `VillagePolicy` → permission-based
-- [ ] Migrasi `WorkUnitPolicy` → permission-based
-- [ ] Migrasi `ServiceTypePolicy` → permission-based
-- [ ] Migrasi `DtsenPurposePolicy` → permission-based
-- [ ] Migrasi `ComplaintCategoryPolicy` → permission-based
-- [ ] Migrasi `ClientCategoryPolicy` → permission-based
-- [ ] Migrasi `ReferralInstitutionPolicy` → permission-based
-- [ ] Tambahkan `getEloquentQuery()` scope di `ServiceRequestResource`
-- [ ] Tambahkan `getEloquentQuery()` scope di `ComplaintResource`
-- [ ] Tambahkan `getEloquentQuery()` scope di `RehabilitationCaseResource`
-- Dokumen privat tetap lewat temporary signed URL; cek Policy dilakukan sebelum URL dibuat.
+- [x] Migrasi `ServiceRequestPolicy` → permission-based + scoping wilayah
+- [x] Migrasi `ComplaintPolicy` → permission-based + scoping wilayah
+- [x] Migrasi `RehabilitationCasePolicy` → permission-based + scoping petugas
+- [x] Migrasi `ClientPolicy` → permission-based (data sensitif)
+- [x] Migrasi `ReferralPolicy` → permission-based + scoping petugas
+- [x] Migrasi `UserPolicy` → permission-based
+- [x] Migrasi `DistrictPolicy` → permission-based
+- [x] Migrasi `VillagePolicy` → permission-based
+- [x] Migrasi `WorkUnitPolicy` → permission-based
+- [x] Migrasi `ServiceTypePolicy` → permission-based
+- [x] Migrasi `DtsenPurposePolicy` → permission-based
+- [x] Migrasi `ComplaintCategoryPolicy` → permission-based
+- [x] Migrasi `ClientCategoryPolicy` → permission-based
+- [x] Migrasi `ReferralInstitutionPolicy` → permission-based
+- [x] Tambahkan `getEloquentQuery()` scope di `ServiceRequestResource` (wilayah & pemohon)
+- [x] Tambahkan `getEloquentQuery()` scope di `ComplaintResource` (wilayah & pelapor)
+- [x] Tambahkan `getEloquentQuery()` scope di `RehabilitationCaseResource` (penugasan petugas)
+- [ ] Dokumen privat tetap lewat temporary signed URL; cek Policy dilakukan sebelum URL dibuat.
 
 ---
 
@@ -412,10 +414,10 @@ Test matriks role × resource × aksi. Kasus minimal:
 - [x] Masyarakat mengakses `/admin` → 403 (diverifikasi di `AdminPanelResourcesTest`)
 - [x] Staff tanpa permission `kelola_user` mengakses `/admin/roles` dan `/admin/permissions` → 403
 - [x] Administrator mengakses `/admin/roles` dan `/admin/permissions` → 200
-- [ ] Masyarakat membuka tiket milik orang lain → ditolak
-- [ ] Operator wilayah A membuka data wilayah B → ditolak
-- [ ] Pimpinan mencoba edit/hapus → ditolak
-- [ ] Petugas yang tidak ditugaskan membuka kasus rehabilitasi → ditolak
+- [x] Masyarakat membuka tiket milik orang lain → ditolak (diverifikasi di `PolicyAuthorizationTest`)
+- [x] Operator wilayah A membuka data wilayah B → ditolak (diverifikasi di `PolicyAuthorizationTest`)
+- [x] Pimpinan mencoba edit/hapus → ditolak (diverifikasi di `PolicyAuthorizationTest`)
+- [x] Petugas yang tidak ditugaskan membuka/mengedit kasus rehabilitasi → ditolak (diverifikasi di `PolicyAuthorizationTest`)
 - [ ] User dengan `is_active = false` → tidak bisa masuk
 - [x] Cache permission ter-reset setelah perubahan role (otomatis lewat `forgetCachedPermissions()` di form & page hooks)
 
@@ -425,8 +427,9 @@ Test matriks role × resource × aksi. Kasus minimal:
 
 1. ~~Fase 1 dan 2~~ ✅ Selesai
 2. ~~Fase 3 (Gerbang Panel Filament & Manajemen Role/Permission)~~ ✅ Selesai (UserResource, RoleResource, PermissionResource, Policies)
-3. Fase 4, per modul sesuai prioritas PRD: DTSEN → PBI-JK → Rehabilitasi → Pengaduan
-4. Fase 5 dan 6 berjalan paralel dengan Fase 4
+3. ~~Fase 4 (Migrasi Policy & Scoping Query)~~ ✅ Selesai (14 Policy dimigrasikan ke PermissionType + scoping wilayah & penugasan)
+4. Fase 5 dan penguatan audit log/rate limiting
+5. Fase 6 pengujian akhir komprehensif
 
 ---
 
@@ -462,4 +465,19 @@ Test matriks role × resource × aksi. Kasus minimal:
 | `app/Filament/Resources/Permissions/Tables/PermissionsTable.php` | ✅ Baru | Tabel Permission dengan pencarian deskripsi, filter grup/role, dan kode copyable |
 | `app/Filament/Resources/Permissions/Pages/ListPermissions.php` | ✅ Baru | Halaman daftar Permission |
 | `app/Filament/Resources/Permissions/Pages/EditPermission.php` | ✅ Baru | Halaman edit penetapan role pada Permission |
+| `app/Policies/ServiceRequestPolicy.php` | ✅ Diperbarui | Migrasi ke `PermissionType` + scoping wilayah & pemohon |
+| `app/Policies/ComplaintPolicy.php` | ✅ Diperbarui | Migrasi ke `PermissionType` + scoping wilayah & pelapor |
+| `app/Policies/RehabilitationCasePolicy.php` | ✅ Diperbarui | Migrasi ke `PermissionType` + scoping petugas kasus |
+| `app/Policies/ClientPolicy.php` | ✅ Diperbarui | Migrasi ke `PermissionType` |
+| `app/Policies/ReferralPolicy.php` | ✅ Diperbarui | Migrasi ke `PermissionType` |
+| `app/Policies/DistrictPolicy.php` | ✅ Diperbarui | Migrasi ke `PermissionType::ManageRegions` |
+| `app/Policies/VillagePolicy.php` | ✅ Diperbarui | Migrasi ke `PermissionType::ManageRegions` |
+| `app/Policies/WorkUnitPolicy.php` | ✅ Diperbarui | Migrasi ke `PermissionType::ManageWorkUnits` |
+| `app/Policies/ServiceTypePolicy.php` | ✅ Diperbarui | Migrasi ke `PermissionType::ManageServiceTypes` |
+| `app/Policies/DtsenPurposePolicy.php` | ✅ Diperbarui | Migrasi ke `PermissionType::ManageDtsenPurposes` |
+| `app/Policies/ComplaintCategoryPolicy.php` | ✅ Diperbarui | Migrasi ke `PermissionType::ManageComplaintCategories` |
+| `app/Policies/ClientCategoryPolicy.php` | ✅ Diperbarui | Migrasi ke `PermissionType::ManageClientCategories` |
+| `app/Policies/ReferralInstitutionPolicy.php` | ✅ Diperbarui | Migrasi ke `PermissionType::ManageReferralInstitutions` |
+| `app/Filament/Resources/RehabilitationCases/RehabilitationCaseResource.php` | ✅ Diperbarui | Tambah `getEloquentQuery()` scoping penugasan petugas |
 | `tests/Feature/AdminPanelResourcesTest.php` | ✅ Diperbarui | Test akses Role & Permission Resource serta proteksi non-admin & masyarakat |
+| `tests/Feature/PolicyAuthorizationTest.php` | ✅ Baru | Test otorisasi Policy lengkap (wilayah, kepemilikan, role, master data) |

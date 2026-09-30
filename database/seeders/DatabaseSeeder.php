@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
             RehabilitationCaseSeeder::class,
             ServiceRequestSeeder::class,
             ComplaintSeeder::class,
+            DashboardDummyDataSeeder::class,
         ]);
     }
 }
